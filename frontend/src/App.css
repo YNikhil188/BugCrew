@@ -134,6 +134,8 @@ body {
   background: linear-gradient(180deg, var(--dark), #2c2c3e);
   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  /* Temporary debugging border */
+  border: 3px solid red !important;
 }
 
 .sidebar-logo-container {
@@ -283,16 +285,13 @@ body.dark-mode .form-select {
 /* Responsive */
 @media (max-width: 768px) {
   .sidebar {
-    position: fixed !important;
-    left: -250px;
-    z-index: 1050 !important;
-    top: 0;
-    height: 100vh;
+    /* Let Framer Motion handle positioning */
+    top: 0 !important;
+    height: 100vh !important;
     width: 250px !important;
-  }
-  
-  .sidebar.open {
-    left: 0;
+    /* Debug styles */
+    background: red !important; /* Temporary debug */
+    z-index: 9999 !important; /* Ensure it's on top */
   }
   
   /* Adjust main content when sidebar is open on mobile */
@@ -303,6 +302,12 @@ body.dark-mode .form-select {
   /* Navbar hamburger menu */
   .navbar-custom .btn {
     z-index: 1060;
+  }
+  
+  /* Main content should not have sidebar space reserved on mobile */
+  .main-content {
+    width: 100% !important;
+    margin-left: 0 !important;
   }
 }
 

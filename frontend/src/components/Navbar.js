@@ -25,7 +25,10 @@ const Navbar = ({ user }) => {
         <div className="d-flex align-items-center flex-grow-1">
           <button 
             className="btn btn-link text-dark d-md-none"
-            onClick={toggleMobileMenu}
+            onClick={() => {
+              console.log('Hamburger clicked!');
+              toggleMobileMenu();
+            }}
           >
             <i className="bi bi-list fs-4"></i>
           </button>

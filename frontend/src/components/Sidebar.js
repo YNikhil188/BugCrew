@@ -75,13 +75,18 @@ const Sidebar = ({ role }) => {
   // Check if we're on mobile
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      console.log('Mobile check:', { windowWidth: window.innerWidth, isMobile: mobile });
     };
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+  
+  // Debug logging
+  console.log('Sidebar render:', { isMobile, isMobileOpen, isCollapsed, role });
 
   // Close mobile menu when clicking on a link
   const handleLinkClick = () => {
@@ -128,15 +133,18 @@ const Sidebar = ({ role }) => {
 
       <motion.div
         className="sidebar"
-        initial={{ x: -250 }}
+        initial={false}
         animate={{ 
           x: isMobile ? (isMobileOpen ? 0 : -250) : 0,
-          width: isCollapsed ? '80px' : '250px'
+          width: isCollapsed && !isMobile ? '80px' : '250px'
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         style={{
+          position: isMobile ? 'fixed' : 'relative',
           zIndex: isMobile ? 1050 : 'auto',
-          position: isMobile ? 'fixed' : 'relative'
+          left: isMobile ? 0 : 'auto', // Ensure left is 0 for mobile
+          top: isMobile ? 0 : 'auto',
+          height: isMobile ? '100vh' : 'auto'
         }}
       >
       <div className="p-4 position-relative">
