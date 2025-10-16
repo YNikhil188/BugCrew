@@ -20,7 +20,8 @@ const DeveloperDashboard = () => {
   const [showMyProjects, setShowMyProjects] = useState(false);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('kanban'); // 'kanban' or 'list'
-
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
   const columns = {
     open: { title: 'To Do', color: 'info', bugs: [] },
     'in-progress': { title: 'In Progress', color: 'warning', bugs: [] },
