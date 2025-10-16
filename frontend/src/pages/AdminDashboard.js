@@ -6,6 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -21,10 +22,10 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const [usersRes, projectsRes, bugsRes, bugStatsRes] = await Promise.all([
-        axios.get('/api/users'),
-        axios.get('/api/projects'),
-        axios.get('/api/bugs'),
-        axios.get('/api/bugs/stats')
+        axios.get(`${API_BASE_URL}/api/users`),
+        axios.get(`${API_BASE_URL}/api/projects`),
+        axios.get(`${API_BASE_URL}/api/bugs`),
+        axios.get(`${API_BASE_URL}/api/bugs/stats`)
       ]);
 
       setStats({

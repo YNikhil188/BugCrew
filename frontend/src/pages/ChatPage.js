@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 
 const ChatPage = () => {
   const { user } = useContext(AuthContext);
@@ -38,7 +39,7 @@ const ChatPage = () => {
 
   const fetchConversations = async () => {
     try {
-      const res = await axios.get('/api/messages/conversations');
+      const res = await axios.get(`${API_BASE_URL}/api/messages/conversations`);
       setConversations(res.data);
       setLoading(false);
     } catch (error) {
@@ -49,7 +50,7 @@ const ChatPage = () => {
 
   const fetchAllUsers = async () => {
     try {
-      const res = await axios.get('/api/messages/users/all');
+      const res = await axios.get(`${API_BASE_URL}/api/messages/users/all`);
       setAllUsers(res.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -58,7 +59,7 @@ const ChatPage = () => {
 
   const fetchMessages = async (userId) => {
     try {
-      const res = await axios.get(`/api/messages/${userId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/messages/${userId}`);
       setMessages(res.data);
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -70,7 +71,7 @@ const ChatPage = () => {
     if (!newMessage.trim() || !selectedUser) return;
 
     try {
-      const res = await axios.post('/api/messages', {
+      const res = await axios.post(`${API_BASE_URL}/api/messages`, {
         receiverId: selectedUser._id,
         content: newMessage
       });

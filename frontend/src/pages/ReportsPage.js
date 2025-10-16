@@ -3,7 +3,8 @@ import { Container, Row, Col, Card, Table } from 'react-bootstrap';
 import { AuthContext } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
-import axios from 'axios';
+
+import API_BASE_URL from '../config/api';
 
 const ReportsPage = () => {
   const { user } = useContext(AuthContext);
@@ -39,9 +40,9 @@ const ReportsPage = () => {
   const fetchReportsData = async () => {
     try {
       const [bugsRes, projectsRes, usersRes] = await Promise.all([
-        axios.get('/api/bugs'),
-        axios.get('/api/projects'),
-        user?.role === 'admin' ? axios.get('/api/users') : Promise.resolve({ data: [] })
+        axios.get('${API_BASE_URL}/api/bugs'),
+        axios.get('${API_BASE_URL}/api/projects'),
+        user?.role === 'admin' ? axios.get('${API_BASE_URL}/api/users') : Promise.resolve({ data: [] })
       ]);
 
       const bugs = bugsRes.data;

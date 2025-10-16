@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-import axios from 'axios';
+
+import API_BASE_URL from '../config/api';
 
 const TeamPage = () => {
   const { user } = useContext(AuthContext);
@@ -32,9 +33,9 @@ const TeamPage = () => {
       };
 
       const [usersRes, projectsRes, bugsRes] = await Promise.all([
-        axios.get('/api/users', config),
-        axios.get('/api/projects', config),
-        axios.get('/api/bugs', config)
+        axios.get('${API_BASE_URL}/api/users', config),
+        axios.get('${API_BASE_URL}/api/projects', config),
+        axios.get('${API_BASE_URL}/api/bugs', config)
       ]);
       
       console.log('Fetched users:', usersRes.data);

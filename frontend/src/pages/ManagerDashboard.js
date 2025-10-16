@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, LineElement, PointElement } from 'chart.js';
 import { Doughnut, Bar, Line } from 'react-chartjs-2';
 
@@ -44,9 +45,9 @@ const ManagerDashboard = () => {
   const fetchData = async () => {
     try {
       const [projectsRes, usersRes, bugsRes] = await Promise.all([
-        axios.get('/api/projects'),
-        axios.get('/api/users'),
-        axios.get('/api/bugs')
+        axios.get(`${API_BASE_URL}/api/projects`),
+        axios.get(`${API_BASE_URL}/api/users`),
+        axios.get(`${API_BASE_URL}/api/bugs`)
       ]);
       setProjects(projectsRes.data);
       setUsers(usersRes.data.filter(u => u.role === 'developer' || u.role === 'tester'));
@@ -62,9 +63,9 @@ const ManagerDashboard = () => {
     e.preventDefault();
     try {
       if (editingProject) {
-        await axios.put(`/api/projects/${editingProject._id}`, projectForm);
+        await axios.put(`${API_BASE_URL}/api/projects/${editingProject._id}`, projectForm);
       } else {
-        await axios.post('/api/projects', projectForm);
+        await axios.post(`${API_BASE_URL}/api/projects`, projectForm);
       }
       setShowProjectModal(false);
       resetProjectForm();
@@ -77,7 +78,7 @@ const ManagerDashboard = () => {
   const handleAssignTeamMember = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`/api/projects/${selectedProject._id}/team`, {
+      await axios.post(`${API_BASE_URL}/api/projects/${selectedProject._id}/team`, {
         userId: assignForm.userId,
         role: assignForm.role,
         sendEmail: assignForm.sendEmail
@@ -93,7 +94,7 @@ const ManagerDashboard = () => {
   const handleRemoveTeamMember = async (projectId, userId) => {
     if (window.confirm('Remove this team member?')) {
       try {
-        await axios.delete(`/api/projects/${projectId}/team/${userId}`);
+        await axios.delete(`${API_BASE_URL}/api/projects/${projectId}/team/${userId}`);
         fetchData();
       } catch (error) {
         alert('Error removing team member');
@@ -104,7 +105,7 @@ const ManagerDashboard = () => {
   const handleDeleteProject = async (projectId) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        await axios.delete(`/api/projects/${projectId}`);
+        await axios.delete(`${API_BASE_URL}/api/projects/${projectId}`);
         fetchData();
       } catch (error) {
         alert('Error deleting project');

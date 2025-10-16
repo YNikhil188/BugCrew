@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-import axios from 'axios';
+
+import API_BASE_URL from '../config/api';
 
 const TesterDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -36,8 +37,8 @@ const TesterDashboard = () => {
   const fetchData = async () => {
     try {
       const [bugsRes, projectsRes] = await Promise.all([
-        axios.get('/api/bugs'),
-        axios.get('/api/projects')
+        axios.get('${API_BASE_URL}/api/bugs'),
+        axios.get('${API_BASE_URL}/api/projects')
       ]);
       // Filter to only show bugs reported by this tester
       setBugs(bugsRes.data.filter(b => b.reporter?._id === user._id));
@@ -69,7 +70,7 @@ const TesterDashboard = () => {
         data.append('screenshots', file);
       });
 
-      await axios.post('/api/bugs', data);
+      await axios.post('${API_BASE_URL}/api/bugs', data);
       setShowModal(false);
       resetForm();
       fetchData();

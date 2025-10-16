@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 
 const BugsPage = () => {
   const { user } = useContext(AuthContext);
@@ -41,7 +42,7 @@ const BugsPage = () => {
 
   const fetchBugs = async () => {
     try {
-      const res = await axios.get('/api/bugs');
+      const res = await axios.get(`${API_BASE_URL}/api/bugs`);
       setBugs(res.data);
       setLoading(false);
     } catch (error) {
@@ -52,7 +53,7 @@ const BugsPage = () => {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get('/api/projects');
+      const res = await axios.get(`${API_BASE_URL}/api/projects`);
       setProjects(res.data);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -61,7 +62,7 @@ const BugsPage = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('/api/users');
+      const res = await axios.get(`${API_BASE_URL}/api/users`);
       // Only fetch developers for bug assignment (testers cannot be assigned bugs)
       setUsers(res.data.filter(u => u.role === 'developer'));
     } catch (error) {
@@ -81,9 +82,9 @@ const BugsPage = () => {
       });
 
       if (editingBug) {
-        await axios.put(`/api/bugs/${editingBug._id}`, formData);
+        await axios.put(`${API_BASE_URL}/api/bugs/${editingBug._id}`, formData);
       } else {
-        await axios.post('/api/bugs', data);
+        await axios.post(`${API_BASE_URL}/api/bugs`, data);
       }
       setShowModal(false);
       resetForm();
@@ -111,7 +112,7 @@ const BugsPage = () => {
   const handleDelete = async (bugId) => {
     if (window.confirm('Are you sure you want to delete this bug?')) {
       try {
-        await axios.delete(`/api/bugs/${bugId}`);
+        await axios.delete(`${API_BASE_URL}/api/bugs/${bugId}`);
         fetchBugs();
       } catch (error) {
         alert('Error deleting bug');
@@ -121,7 +122,7 @@ const BugsPage = () => {
 
   const handleStatusChange = async (bugId, newStatus) => {
     try {
-      await axios.put(`/api/bugs/${bugId}`, { status: newStatus });
+      await axios.put(`${API_BASE_URL}/api/bugs/${bugId}`, { status: newStatus });
       fetchBugs();
     } catch (error) {
       alert('Error updating bug status');
@@ -131,7 +132,7 @@ const BugsPage = () => {
   const handleAssignBug = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/bugs/${selectedBug._id}/assign`, {
+      await axios.put(`${API_BASE_URL}/api/bugs/${selectedBug._id}/assign`, {
         userId: assignForm.userId,
         sendEmail: assignForm.sendEmail
       });

@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 
 const ProjectsPage = () => {
   const { user } = useContext(AuthContext);
@@ -32,7 +33,7 @@ const ProjectsPage = () => {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get('/api/projects');
+      const res = await axios.get(`${API_BASE_URL}/api/projects`);
       setProjects(res.data);
       setLoading(false);
     } catch (error) {
@@ -43,7 +44,7 @@ const ProjectsPage = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('/api/users');
+      const res = await axios.get(`${API_BASE_URL}/api/users`);
       setUsers(res.data.filter(u => u.role === 'developer' || u.role === 'tester'));
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -54,9 +55,9 @@ const ProjectsPage = () => {
     e.preventDefault();
     try {
       if (editingProject) {
-        await axios.put(`/api/projects/${editingProject._id}`, formData);
+        await axios.put(`${API_BASE_URL}/api/projects/${editingProject._id}`, formData);
       } else {
-        await axios.post('/api/projects', formData);
+        await axios.post(`${API_BASE_URL}/api/projects`, formData);
       }
       setShowModal(false);
       resetForm();
@@ -83,7 +84,7 @@ const ProjectsPage = () => {
   const handleDelete = async (projectId) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        await axios.delete(`/api/projects/${projectId}`);
+        await axios.delete(`${API_BASE_URL}/api/projects/${projectId}`);
         fetchProjects();
       } catch (error) {
         alert('Error deleting project');
@@ -94,7 +95,7 @@ const ProjectsPage = () => {
   const handleAddTeamMember = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`/api/projects/${selectedProject._id}/team`, teamMember);
+      await axios.post(`${API_BASE_URL}/api/projects/${selectedProject._id}/team`, teamMember);
       setShowTeamModal(false);
       setTeamMember({ userId: '', role: 'developer' });
       fetchProjects();
@@ -105,7 +106,7 @@ const ProjectsPage = () => {
 
   const handleRemoveTeamMember = async (projectId, userId) => {
     try {
-      await axios.delete(`/api/projects/${projectId}/team/${userId}`);
+      await axios.delete(`${API_BASE_URL}/api/projects/${projectId}/team/${userId}`);
       fetchProjects();
     } catch (error) {
       alert('Error removing team member');

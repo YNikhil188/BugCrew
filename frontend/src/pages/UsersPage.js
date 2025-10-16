@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 
 const UsersPage = () => {
   const { user } = useContext(AuthContext);
@@ -26,7 +27,7 @@ const UsersPage = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('/api/users');
+      const res = await axios.get(`${API_BASE_URL}/api/users`);
       setUsers(res.data);
       setLoading(false);
     } catch (error) {
@@ -39,9 +40,9 @@ const UsersPage = () => {
     e.preventDefault();
     try {
       if (editingUser) {
-        await axios.put(`/api/users/${editingUser._id}`, formData);
+        await axios.put(`${API_BASE_URL}/api/users/${editingUser._id}`, formData);
       } else {
-        await axios.post('/api/auth/register', formData);
+        await axios.post(`${API_BASE_URL}/api/auth/register`, formData);
       }
       setShowModal(false);
       resetForm();
@@ -67,7 +68,7 @@ const UsersPage = () => {
   const handleDelete = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await axios.delete(`/api/users/${userId}`);
+        await axios.delete(`${API_BASE_URL}/api/users/${userId}`);
         fetchUsers();
       } catch (error) {
         alert('Error deleting user');
@@ -77,7 +78,7 @@ const UsersPage = () => {
 
   const toggleActive = async (userId) => {
     try {
-      await axios.put(`/api/users/${userId}/toggle-active`);
+      await axios.put(`${API_BASE_URL}/api/users/${userId}/toggle-active`);
       fetchUsers();
     } catch (error) {
       alert('Error updating user status');

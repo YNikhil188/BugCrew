@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-import axios from 'axios';
+
+import API_BASE_URL from '../config/api';
 
 const DeveloperDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -33,8 +34,8 @@ const DeveloperDashboard = () => {
     try {
       console.log('Developer Dashboard - Fetching data for user:', user);
       const [bugsRes, projectsRes] = await Promise.all([
-        axios.get('/api/bugs'),
-        axios.get('/api/projects')
+        axios.get('${API_BASE_URL}/api/bugs'),
+        axios.get('${API_BASE_URL}/api/projects')
       ]);
       
       console.log('Fetched bugs from API:', bugsRes.data);
