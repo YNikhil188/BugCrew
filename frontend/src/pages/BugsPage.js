@@ -31,6 +31,9 @@ const BugsPage = () => {
     userId: '',
     sendEmail: true
   });
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   useEffect(() => {
     fetchBugs();
@@ -158,6 +161,11 @@ const BugsPage = () => {
     setSelectedFiles([]);
     setEditingBug(null);
   };
+  
+  const openBugDetails = (bug) => {
+    setSelectedBug(bug);
+    setShowDetailsModal(true);
+  };
 
   const getStatusBadge = (status) => {
     const config = {
@@ -279,13 +287,24 @@ const BugsPage = () => {
                                 <i className="bi bi-person-plus me-1"></i>Assign
                               </button>
                             )}
+                            <button 
+                              className="btn btn-sm btn-outline-info me-1"
+                              onClick={() => openBugDetails(bug)}
+                            >
+                              <i className="bi bi-eye"></i> Details
+                            </button>
                             {user?.role === 'developer' && (
                               <button className="btn btn-sm btn-outline-primary" onClick={() => handleEdit(bug)}>
                                 <i className="bi bi-pencil"></i>
                               </button>
                             )}
-                            {user?.role === 'tester' && (
-                              <span className="badge bg-info">View Only</span>
+                            {user?.role === 'tester' && bug.screenshots?.length > 0 && (
+                              <button 
+                                className="btn btn-sm btn-outline-success"
+                                onClick={() => openBugDetails(bug)}
+                              >
+                                <i className="bi bi-paperclip"></i> Attachments
+                              </button>
                             )}
                           </div>
                         </div>
@@ -472,6 +491,173 @@ const BugsPage = () => {
                 </form>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Bug Details Modal */}
+      <AnimatePresence>
+        {showDetailsModal && selectedBug && (
+          <motion.div 
+            className="modal show d-block" 
+            style={{ background: 'rgba(0,0,0,0.5)' }}
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            onClick={() => setShowDetailsModal(false)}
+          >
+            <motion.div 
+              className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable"
+              initial={{ scale: 0.8, y: 50 }} 
+              animate={{ scale: 1, y: 0 }} 
+              exit={{ scale: 0.8, y: 50 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="modal-content">
+                <div className="modal-header">
+                  <div>
+                    <h5>{selectedBug.title}</h5>
+                    <small className="text-muted">{selectedBug.project?.name}</small>
+                  </div>
+                  <button className="btn-close" onClick={() => setShowDetailsModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <strong>Description:</strong>
+                    <p className="text-muted">{selectedBug.description}</p>
+                  </div>
+                  
+                  <div className="row mb-3">
+                    <div className="col-md-6">
+                      <strong>Priority:</strong> <span className={`badge priority-${selectedBug.priority} ms-2`}>{selectedBug.priority}</span>
+                    </div>
+                    <div className="col-md-6">
+                      <strong>Status:</strong> {getStatusBadge(selectedBug.status)}
+                    </div>
+                  </div>
+                  
+                  <div className="row mb-3">
+                    <div className="col-md-6">
+                      <strong>Reporter:</strong> {selectedBug.reporter?.name}
+                    </div>
+                    <div className="col-md-6">
+                      <strong>Assigned To:</strong> {selectedBug.assignedTo?.name || 'Unassigned'}
+                    </div>
+                  </div>
+                  
+                  {selectedBug.stepsToReproduce && (
+                    <div className="mb-3">
+                      <strong>Steps to Reproduce:</strong>
+                      <p className="text-muted">{selectedBug.stepsToReproduce}</p>
+                    </div>
+                  )}
+                  
+                  {selectedBug.environment && (
+                    <div className="mb-3">
+                      <strong>Environment:</strong>
+                      <p className="text-muted">{selectedBug.environment}</p>
+                    </div>
+                  )}
+                  
+                  {selectedBug.screenshots && selectedBug.screenshots.length > 0 && (
+                    <div className="mb-3">
+                      <strong>
+                        <i className="bi bi-paperclip me-2"></i>
+                        Attachments ({selectedBug.screenshots.length})
+                      </strong>
+                      <div className="row g-2 mt-2">
+                        {selectedBug.screenshots.map((screenshot, index) => (
+                          <div key={index} className="col-md-3">
+                            <div 
+                              className="card card-hover"
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => {
+                                setSelectedImage(`${API_BASE_URL}/${screenshot}`);
+                                setShowImageModal(true);
+                              }}
+                            >
+                              <img 
+                                src={`${API_BASE_URL}/${screenshot}`} 
+                                alt={`Screenshot ${index + 1}`}
+                                className="card-img-top"
+                                style={{ 
+                                  height: '80px', 
+                                  objectFit: 'cover',
+                                  borderRadius: '4px'
+                                }}
+                                onError={(e) => {
+                                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0zNS41IDQwQzM3LjE1NjkgNDAgMzguNSAzOC42NTY5IDM4LjUgMzdDMzguNSAzNS4zNDMxIDM3LjE1NjkgMzQgMzUuNSAzNEMzMy44NDMxIDM0IDMyLjUgMzUuMzQzMSAzMi41IDM3QzMyLjUgMzguNjU2OSAzMy44NDMxIDQwIDM1LjUgNDBaIiBmaWxsPSIjQzVDNUM1Ii8+CjxwYXRoIGQ9Ik0yNS41IDY2SDc0LjVWNTBIMjUuNVY2NloiIGZpbGw9IiNFNUU1RTUiLz4KPHA+SW1hZ2UgTm90IEZvdW5kPC9wPgo8L3N2Zz4K';
+                                }}
+                              />
+                              <div className="card-body p-2">
+                                <small className="text-muted">Screenshot {index + 1}</small>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Image Lightbox Modal */}
+      <AnimatePresence>
+        {showImageModal && (
+          <motion.div 
+            className="modal show d-block" 
+            style={{ background: 'rgba(0,0,0,0.8)', zIndex: 2000 }}
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            onClick={() => setShowImageModal(false)}
+          >
+            <div className="modal-dialog modal-dialog-centered modal-xl">
+              <motion.div 
+                className="modal-content bg-transparent border-0"
+                initial={{ scale: 0.8 }} 
+                animate={{ scale: 1 }} 
+                exit={{ scale: 0.8 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header border-0 pb-0">
+                  <h5 className="text-white">Screenshot</h5>
+                  <button 
+                    className="btn-close btn-close-white" 
+                    onClick={() => setShowImageModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body text-center">
+                  <img 
+                    src={selectedImage} 
+                    alt="Screenshot" 
+                    className="img-fluid rounded"
+                    style={{ maxHeight: '70vh', maxWidth: '100%' }}
+                  />
+                </div>
+                <div className="modal-footer border-0 pt-0">
+                  <a 
+                    href={selectedImage} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="btn btn-outline-light"
+                  >
+                    <i className="bi bi-download me-2"></i>
+                    Download
+                  </a>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={() => setShowImageModal(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
