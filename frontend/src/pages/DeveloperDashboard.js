@@ -491,7 +491,62 @@ const DeveloperDashboard = () => {
                   <div className="mb-3">
                     <strong>Priority:</strong> <span className={`badge priority-${selectedBug.priority} ms-2`}>{selectedBug.priority}</span>
                   </div>
+                  {/* Steps to Reproduce */}
+                  {selectedBug.stepsToReproduce && (
+                    <div className="mb-3">
+                      <strong>Steps to Reproduce:</strong>
+                      <p className="text-muted">{selectedBug.stepsToReproduce}</p>
+                    </div>
+                  )}
                   
+                  {/* Environment */}
+                  {selectedBug.environment && (
+                    <div className="mb-3">
+                      <strong>Environment:</strong>
+                      <p className="text-muted">{selectedBug.environment}</p>
+                    </div>
+                  )}
+                  
+                  {/* Attachments/Screenshots */}
+                  {selectedBug.screenshots && selectedBug.screenshots.length > 0 && (
+                    <div className="mb-3">
+                      <strong>
+                        <i className="bi bi-paperclip me-2"></i>
+                        Attachments ({selectedBug.screenshots.length})
+                      </strong>
+                      <div className="row g-2 mt-2">
+                        {selectedBug.screenshots.map((screenshot, index) => (
+                          <div key={index} className="col-md-3">
+                            <div 
+                              className="card card-hover"
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => {
+                                setSelectedImage(`${API_BASE_URL}/${screenshot}`);
+                                setShowImageModal(true);
+                              }}
+                            >
+                              <img 
+                                src={`${API_BASE_URL}/${screenshot}`} 
+                                alt={`Screenshot ${index + 1}`}
+                                className="card-img-top"
+                                style={{ 
+                                  height: '80px', 
+                                  objectFit: 'cover',
+                                  borderRadius: '4px'
+                                }}
+                                onError={(e) => {
+                                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0zNS41IDQwQzM3LjE1NjkgNDAgMzguNSAzOC42NTY5IDM4LjUgMzdDMzguNSAzNS4zNDMxIDM3LjE1NjkgMzQgMzUuNSAzNEMzMy44NDMxIDM0IDMyLjUgMzUuMzQzMSAzMi41IDM3QzMyLjUgMzguNjU2OSAzMy44NDMxIDQwIDM1LjUgNDBaIiBmaWxsPSIjQzVDNUM1Ii8+CjxwYXRoIGQ9Ik0yNS41IDY2SDc0LjVWNTBIMjUuNVY2NloiIGZpbGw9IiNFNUU1RTUiLz4KPHA+SW1hZ2UgTm90IEZvdW5kPC9wPgo8L3N2Zz4K';
+                                }}
+                              />
+                              <div className="card-body p-2">
+                                <small className="text-muted">Screenshot {index + 1}</small>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <hr />
                   <h6 className="mb-3">
                     <i className="bi bi-chat-left-text me-2"></i>
