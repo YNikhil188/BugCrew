@@ -1,11 +1,17 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
+import { useSidebar } from '../context/SidebarContext';
 
 const Sidebar = ({ role }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const { logout } = useContext(AuthContext);
+  const { 
+    isMobileOpen, 
+    isCollapsed, 
+    toggleCollapse, 
+    closeMobileMenu 
+  } = useSidebar();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -64,30 +70,104 @@ const Sidebar = ({ role }) => {
   };
 
   const items = menuItems[role] || [];
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Close mobile menu when clicking on a link
+  const handleLinkClick = () => {
+    if (isMobile) {
+      closeMobileMenu();
+    }
+  };
+
+  // Add effect to handle body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileOpen]);
 
   return (
-    <motion.div
-      className="sidebar"
-      initial={{ x: -250 }}
-      animate={{ 
-        x: 0,
-        width: isCollapsed ? '80px' : '250px'
-      }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
-    >
+    <>
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <motion.div
+            className="sidebar-mobile-overlay d-md-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeMobileMenu}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 1040
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="sidebar"
+        initial={{ x: -250 }}
+        animate={{ 
+          x: isMobile ? (isMobileOpen ? 0 : -250) : 0,
+          width: isCollapsed ? '80px' : '250px'
+        }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        style={{
+          zIndex: isMobile ? 1050 : 'auto',
+          position: isMobile ? 'fixed' : 'relative'
+        }}
+      >
       <div className="p-4 position-relative">
-        <motion.button
-          className="btn btn-link text-white position-absolute"
-          style={{ top: '10px', right: '10px', zIndex: 1000 }}
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <i className={`bi bi-${isCollapsed ? 'chevron-right' : 'chevron-left'}`}></i>
-        </motion.button>
+        {/* Desktop collapse button */}
+        {!isMobile && (
+          <motion.button
+            className="btn btn-link text-white position-absolute"
+            style={{ top: '10px', right: '10px', zIndex: 1000 }}
+            onClick={toggleCollapse}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <i className={`bi bi-${isCollapsed ? 'chevron-right' : 'chevron-left'}`}></i>
+          </motion.button>
+        )}
+        
+        {/* Mobile close button */}
+        {isMobile && (
+          <motion.button
+            className="btn btn-link text-white position-absolute"
+            style={{ top: '10px', right: '10px', zIndex: 1000 }}
+            onClick={closeMobileMenu}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <i className="bi bi-x-lg"></i>
+          </motion.button>
+        )}
         
         <AnimatePresence>
-          {!isCollapsed ? (
+          {(!isCollapsed || isMobile) ? (
             <motion.div
               className="sidebar-logo-container mb-4"
               initial={{ opacity: 0 }}
@@ -136,7 +216,7 @@ const Sidebar = ({ role }) => {
                 >
                   <i className={`bi ${item.icon}`}></i>
                   <AnimatePresence>
-                    {!isCollapsed && (
+                    {(!isCollapsed || isMobile) && (
                       <motion.span
                         initial={{ opacity: 0, width: 0 }}
                         animate={{ opacity: 1, width: 'auto' }}
@@ -155,10 +235,11 @@ const Sidebar = ({ role }) => {
                     `sidebar-link ${isActive ? 'active' : ''}`
                   }
                   title={item.label}
+                  onClick={handleLinkClick}
                 >
                   <i className={`bi ${item.icon}`}></i>
                   <AnimatePresence>
-                    {!isCollapsed && (
+                    {(!isCollapsed || isMobile) && (
                       <motion.span
                         initial={{ opacity: 0, width: 0 }}
                         animate={{ opacity: 1, width: 'auto' }}
@@ -176,6 +257,7 @@ const Sidebar = ({ role }) => {
         </nav>
       </div>
     </motion.div>
+    </>
   );
 };
 

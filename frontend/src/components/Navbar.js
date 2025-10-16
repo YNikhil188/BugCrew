@@ -2,9 +2,11 @@ import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useSidebar } from '../context/SidebarContext';
 
 const Navbar = ({ user }) => {
   const { logout } = useContext(AuthContext);
+  const { toggleMobileMenu } = useSidebar();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -21,7 +23,10 @@ const Navbar = ({ user }) => {
     >
       <div className="container-fluid px-4">
         <div className="d-flex align-items-center flex-grow-1">
-          <button className="btn btn-link text-dark d-md-none">
+          <button 
+            className="btn btn-link text-dark d-md-none"
+            onClick={toggleMobileMenu}
+          >
             <i className="bi bi-list fs-4"></i>
           </button>
           <div className="input-group ms-3" style={{ maxWidth: '400px' }}>
