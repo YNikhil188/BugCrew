@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-
+import axios from 'axios';
 import API_BASE_URL from '../config/api';
 
 const TesterDashboard = () => {
@@ -37,8 +37,8 @@ const TesterDashboard = () => {
   const fetchData = async () => {
     try {
       const [bugsRes, projectsRes] = await Promise.all([
-        axios.get('${API_BASE_URL}/api/bugs'),
-        axios.get('${API_BASE_URL}/api/projects')
+        axios.get(`${API_BASE_URL}/api/bugs`),
+        axios.get(`${API_BASE_URL}/api/projects`)
       ]);
       // Filter to only show bugs reported by this tester
       setBugs(bugsRes.data.filter(b => b.reporter?._id === user._id));
@@ -52,7 +52,7 @@ const TesterDashboard = () => {
 
   const fetchComments = async (bugId) => {
     try {
-      const res = await axios.get(`/api/comments/bug/${bugId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/comments/bug/${bugId}`);
       setComments(res.data);
     } catch (error) {
       console.error('Error fetching comments:', error);
@@ -70,7 +70,7 @@ const TesterDashboard = () => {
         data.append('screenshots', file);
       });
 
-      await axios.post('${API_BASE_URL}/api/bugs', data);
+      await axios.post(`${API_BASE_URL}/api/bugs`, data);
       setShowModal(false);
       resetForm();
       fetchData();
@@ -83,7 +83,7 @@ const TesterDashboard = () => {
     e.preventDefault();
     if (!newComment.trim()) return;
     try {
-      await axios.post(`/api/comments/bug/${selectedBug._id}`, { content: newComment });
+      await axios.post(`${API_BASE_URL}/api/comments/bug/${selectedBug._id}`, { content: newComment });
       setNewComment('');
       fetchComments(selectedBug._id);
     } catch (error) {
@@ -106,7 +106,7 @@ const TesterDashboard = () => {
     }
     
     try {
-      await axios.put(`/api/bugs/${bugId}/verify`, { action });
+      await axios.put(`${API_BASE_URL}/api/bugs/${bugId}/verify`, { action });
       fetchData();
       if (showComments) setShowComments(false);
     } catch (error) {

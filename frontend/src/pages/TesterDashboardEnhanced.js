@@ -4,7 +4,8 @@ import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 
-import API_BASE_URL from '../config/api';
+import axios from 'axios';
+
 
 const TesterDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -34,8 +35,8 @@ const TesterDashboard = () => {
   const fetchData = async () => {
     try {
       const [bugsRes, projectsRes] = await Promise.all([
-        axios.get('${API_BASE_URL}/api/bugs'),
-        axios.get('${API_BASE_URL}/api/projects')
+        axios.get(\$\{API_BASE_URL\}/api/bugs'),
+        axios.get(\$\{API_BASE_URL\}/api/projects')
       ]);
       setBugs(bugsRes.data.filter(b => b.reporter?._id === user._id));
       setProjects(projectsRes.data);
@@ -64,7 +65,7 @@ const TesterDashboard = () => {
         data.append('screenshots', file);
       });
 
-      await axios.post('${API_BASE_URL}/api/bugs', data);
+      await axios.post(\$\{API_BASE_URL\}/api/bugs', data);
       setShowModal(false);
       resetForm();
       fetchData();

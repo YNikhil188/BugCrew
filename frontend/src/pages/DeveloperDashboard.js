@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-
+import axios from 'axios';
 import API_BASE_URL from '../config/api';
+
 
 const DeveloperDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -34,8 +35,8 @@ const DeveloperDashboard = () => {
     try {
       console.log('Developer Dashboard - Fetching data for user:', user);
       const [bugsRes, projectsRes] = await Promise.all([
-        axios.get('${API_BASE_URL}/api/bugs'),
-        axios.get('${API_BASE_URL}/api/projects')
+        axios.get(`${API_BASE_URL}/api/bugs`),
+        axios.get(`${API_BASE_URL}/api/projects`)
       ]);
       
       console.log('Fetched bugs from API:', bugsRes.data);
@@ -68,7 +69,7 @@ const DeveloperDashboard = () => {
 
   const fetchComments = async (bugId) => {
     try {
-      const res = await axios.get(`/api/comments/bug/${bugId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/comments/bug/${bugId}`);
       setComments(res.data);
     } catch (error) {
       console.error('Error fetching comments:', error);
@@ -77,7 +78,7 @@ const DeveloperDashboard = () => {
 
   const handleStatusChange = async (bugId, newStatus) => {
     try {
-      await axios.put(`/api/bugs/${bugId}`, { status: newStatus });
+      await axios.put(`${API_BASE_URL}/api/bugs/${bugId}`, { status: newStatus });
       fetchData();
     } catch (error) {
       alert('Error updating bug status');
@@ -88,7 +89,7 @@ const DeveloperDashboard = () => {
     e.preventDefault();
     if (!newComment.trim()) return;
     try {
-      await axios.post(`/api/comments/bug/${selectedBug._id}`, { content: newComment });
+      await axios.post(`${API_BASE_URL}/api/comments/bug/${selectedBug._id}`, { content: newComment });
       setNewComment('');
       fetchComments(selectedBug._id);
     } catch (error) {

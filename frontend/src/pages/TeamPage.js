@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-
+import axios from 'axios';
 import API_BASE_URL from '../config/api';
+
 
 const TeamPage = () => {
   const { user } = useContext(AuthContext);
@@ -33,9 +34,9 @@ const TeamPage = () => {
       };
 
       const [usersRes, projectsRes, bugsRes] = await Promise.all([
-        axios.get('${API_BASE_URL}/api/users', config),
-        axios.get('${API_BASE_URL}/api/projects', config),
-        axios.get('${API_BASE_URL}/api/bugs', config)
+        axios.get(`${API_BASE_URL}/api/users`, config),
+        axios.get(`${API_BASE_URL}/api/projects`, config),
+        axios.get(`${API_BASE_URL}/api/bugs`, config)
       ]);
       
       console.log('Fetched users:', usersRes.data);
@@ -96,7 +97,7 @@ const TeamPage = () => {
   const handleAssignBug = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/bugs/${selectedBugId}/assign`, {
+      await axios.put(`${API_BASE_URL}/api/bugs/${selectedBugId}/assign`, {
         userId: selectedMember._id,
         sendEmail: sendEmail
       });
@@ -130,7 +131,7 @@ const TeamPage = () => {
       // Add the member to the team
       const updatedTeam = [...(project.team || []), { user: selectedMember._id, role: selectedMember.role }];
       
-      await axios.put(`/api/projects/${selectedProjectId}`, {
+      await axios.put(`${API_BASE_URL}/api/projects/${selectedProjectId}`, {
         ...project,
         team: updatedTeam
       });

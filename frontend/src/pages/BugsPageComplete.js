@@ -4,7 +4,8 @@ import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 
-import API_BASE_URL from '../config/api';
+import axios from 'axios';
+
 
 const BugsPage = () => {
   const { user } = useContext(AuthContext);
@@ -32,7 +33,7 @@ const BugsPage = () => {
 
   const fetchBugs = async () => {
     try {
-      const res = await axios.get('${API_BASE_URL}/api/bugs');
+      const res = await axios.get(\$\{API_BASE_URL\}/api/bugs');
       setBugs(res.data);
       setLoading(false);
     } catch (error) {
@@ -43,7 +44,7 @@ const BugsPage = () => {
 
   const fetchProjects = async () => {
     try {
-      const res = await axios.get('${API_BASE_URL}/api/projects');
+      const res = await axios.get(\$\{API_BASE_URL\}/api/projects');
       setProjects(res.data);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -64,7 +65,7 @@ const BugsPage = () => {
       if (editingBug) {
         await axios.put(`/api/bugs/${editingBug._id}`, formData);
       } else {
-        await axios.post('${API_BASE_URL}/api/bugs', data);
+        await axios.post(\$\{API_BASE_URL\}/api/bugs', data);
       }
       setShowModal(false);
       resetForm();

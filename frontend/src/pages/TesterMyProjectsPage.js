@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-
+import axios from 'axios';
 import API_BASE_URL from '../config/api';
 
 const TesterMyProjectsPage = () => {
@@ -17,7 +17,7 @@ const TesterMyProjectsPage = () => {
 
   const fetchMyProjects = async () => {
     try {
-      const res = await axios.get('${API_BASE_URL}/api/projects');
+      const res = await axios.get(`${API_BASE_URL}/api/projects`);
       
       // Filter projects where user is a team member
       const userProjects = res.data.filter(p => {
