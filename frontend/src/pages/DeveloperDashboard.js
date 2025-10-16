@@ -22,6 +22,7 @@ const DeveloperDashboard = () => {
   const [viewMode, setViewMode] = useState('kanban'); // 'kanban' or 'list'
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
+
   const columns = {
     open: { title: 'To Do', color: 'info', bugs: [] },
     'in-progress': { title: 'In Progress', color: 'warning', bugs: [] },
@@ -351,7 +352,14 @@ const DeveloperDashboard = () => {
                             style={{ cursor: 'pointer' }}
                           >
                             <div className="card-body p-3">
-                              <h6 className="mb-2">{bug.title}</h6>
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <h6 className="mb-0">{bug.title}</h6>
+                                {bug.screenshots && bug.screenshots.length > 0 && (
+                                  <span className="badge bg-info" title={`${bug.screenshots.length} attachment(s)`}>
+                                    <i className="bi bi-paperclip"></i> {bug.screenshots.length}
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-muted small mb-2">{bug.description?.substring(0, 60)}...</p>
                               <div className="d-flex justify-content-between align-items-center">
                                 <span className={`badge priority-${bug.priority}`}>{bug.priority}</span>
@@ -416,10 +424,17 @@ const DeveloperDashboard = () => {
                             onClick={() => openBugDetails(bug)}
                           >
                             <td>
-                              <div>
-                                <strong>{bug.title}</strong>
-                                <br />
-                                <small className="text-muted">{bug.description?.substring(0, 50)}...</small>
+                              <div className="d-flex justify-content-between align-items-start">
+                                <div>
+                                  <strong>{bug.title}</strong>
+                                  <br />
+                                  <small className="text-muted">{bug.description?.substring(0, 50)}...</small>
+                                </div>
+                                {bug.screenshots && bug.screenshots.length > 0 && (
+                                  <span className="badge bg-info ms-2" title={`${bug.screenshots.length} attachment(s)`}>
+                                    <i className="bi bi-paperclip"></i> {bug.screenshots.length}
+                                  </span>
+                                )}
                               </div>
                             </td>
                             <td>{bug.project?.name}</td>
@@ -491,6 +506,7 @@ const DeveloperDashboard = () => {
                   <div className="mb-3">
                     <strong>Priority:</strong> <span className={`badge priority-${selectedBug.priority} ms-2`}>{selectedBug.priority}</span>
                   </div>
+                  
                   {/* Steps to Reproduce */}
                   {selectedBug.stepsToReproduce && (
                     <div className="mb-3">
@@ -547,6 +563,7 @@ const DeveloperDashboard = () => {
                       </div>
                     </div>
                   )}
+                  
                   <hr />
                   <h6 className="mb-3">
                     <i className="bi bi-chat-left-text me-2"></i>
@@ -595,6 +612,63 @@ const DeveloperDashboard = () => {
                 </div>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Image Lightbox Modal */}
+      <AnimatePresence>
+        {showImageModal && (
+          <motion.div 
+            className="modal show d-block" 
+            style={{ background: 'rgba(0,0,0,0.8)', zIndex: 2000 }}
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            onClick={() => setShowImageModal(false)}
+          >
+            <div className="modal-dialog modal-dialog-centered modal-xl">
+              <motion.div 
+                className="modal-content bg-transparent border-0"
+                initial={{ scale: 0.8 }} 
+                animate={{ scale: 1 }} 
+                exit={{ scale: 0.8 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header border-0 pb-0">
+                  <h5 className="text-white">Screenshot</h5>
+                  <button 
+                    className="btn-close btn-close-white" 
+                    onClick={() => setShowImageModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body text-center">
+                  <img 
+                    src={selectedImage} 
+                    alt="Screenshot" 
+                    className="img-fluid rounded"
+                    style={{ maxHeight: '70vh', maxWidth: '100%' }}
+                  />
+                </div>
+                <div className="modal-footer border-0 pt-0">
+                  <a 
+                    href={selectedImage} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="btn btn-outline-light"
+                  >
+                    <i className="bi bi-download me-2"></i>
+                    Download
+                  </a>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={() => setShowImageModal(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
