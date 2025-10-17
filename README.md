@@ -1,4 +1,4 @@
-# 🐛 Bug Tracker - MERN Stack Application
+# 🐛 BugCrew - MERN Stack Application
 
 A beautiful, animated bug tracking web application built with the MERN stack (MongoDB, Express.js, React.js, Node.js) featuring role-based dashboards, real-time notifications, and stunning animations using Framer Motion and Bootstrap 5.
 
