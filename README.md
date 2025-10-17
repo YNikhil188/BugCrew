@@ -91,7 +91,7 @@ A beautiful, animated bug tracking web application built with the MERN stack (Mo
 ### Step 1: Clone the Repository
 ```bash
 cd C:\Users\yalak
-cd bug-tracker
+cd Bugcrew
 ```
 
 ### Step 2: Backend Setup
@@ -235,7 +235,7 @@ You can create test users with different roles:
 ## 🗂️ Project Structure
 
 ```
-bug-tracker/
+Bugcrew/
 ├── backend/
 │   ├── config/
 │   │   └── db.js
