@@ -572,12 +572,12 @@ const BugsPage = () => {
                               className="card card-hover"
                               style={{ cursor: 'pointer' }}
                               onClick={() => {
-                                setSelectedImage(`${API_BASE_URL}/${screenshot}`);
+                                setSelectedImage(`${API_BASE_URL}/uploads/${screenshot}`);
                                 setShowImageModal(true);
                               }}
                             >
                               <img 
-                                src={`${API_BASE_URL}/${screenshot}`} 
+                                src={`${API_BASE_URL}/uploads/${screenshot}`} 
                                 alt={`Screenshot ${index + 1}`}
                                 className="card-img-top"
                                 style={{ 

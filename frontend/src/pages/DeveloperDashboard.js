@@ -22,7 +22,6 @@ const DeveloperDashboard = () => {
   const [viewMode, setViewMode] = useState('kanban'); // 'kanban' or 'list'
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
-
   const columns = {
     open: { title: 'To Do', color: 'info', bugs: [] },
     'in-progress': { title: 'In Progress', color: 'warning', bugs: [] },
@@ -506,7 +505,6 @@ const DeveloperDashboard = () => {
                   <div className="mb-3">
                     <strong>Priority:</strong> <span className={`badge priority-${selectedBug.priority} ms-2`}>{selectedBug.priority}</span>
                   </div>
-                  
                   {/* Steps to Reproduce */}
                   {selectedBug.stepsToReproduce && (
                     <div className="mb-3">
@@ -537,12 +535,12 @@ const DeveloperDashboard = () => {
                               className="card card-hover"
                               style={{ cursor: 'pointer' }}
                               onClick={() => {
-                                setSelectedImage(`${API_BASE_URL}/${screenshot}`);
+                                setSelectedImage(`${API_BASE_URL}/uploads/${screenshot}`);
                                 setShowImageModal(true);
                               }}
                             >
                               <img 
-                                src={`${API_BASE_URL}/${screenshot}`} 
+                                src={`${API_BASE_URL}/uploads/${screenshot}`} 
                                 alt={`Screenshot ${index + 1}`}
                                 className="card-img-top"
                                 style={{ 
@@ -563,7 +561,6 @@ const DeveloperDashboard = () => {
                       </div>
                     </div>
                   )}
-                  
                   <hr />
                   <h6 className="mb-3">
                     <i className="bi bi-chat-left-text me-2"></i>
