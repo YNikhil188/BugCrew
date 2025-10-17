@@ -3,15 +3,54 @@ import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useSidebar } from '../context/SidebarContext';
+import { useNotifications } from '../context/NotificationContext';
 
 const Navbar = ({ user }) => {
   const { logout } = useContext(AuthContext);
   const { toggleMobileMenu } = useSidebar();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleNotificationClick = (notification) => {
+    if (!notification.isRead) {
+      markAsRead(notification._id);
+    }
+    if (notification.actionUrl) {
+      navigate(notification.actionUrl);
+    }
+  };
+
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'bug_assigned':
+        return 'bi-bug-fill text-danger';
+      case 'bug_resolved':
+        return 'bi-check-circle-fill text-success';
+      case 'bug_created':
+        return 'bi-exclamation-triangle-fill text-warning';
+      case 'bug_reopened':
+        return 'bi-arrow-counterclockwise text-warning';
+      case 'project_assigned':
+        return 'bi-folder-fill text-primary';
+      default:
+        return 'bi-info-circle-fill text-info';
+    }
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInMinutes = Math.floor((now - time) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
   return (
@@ -52,60 +91,86 @@ const Navbar = ({ user }) => {
               aria-expanded="false"
             >
               <i className="bi bi-bell fs-5"></i>
-              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                3
-              </span>
+              {unreadCount > 0 && (
+                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </button>
-            <ul className="dropdown-menu dropdown-menu-end shadow" style={{ minWidth: '300px', maxHeight: '400px', overflowY: 'auto' }}>
+            <ul className="dropdown-menu dropdown-menu-end shadow" style={{ minWidth: '350px', maxHeight: '500px', overflowY: 'auto' }}>
               <li>
-                <h6 className="dropdown-header d-flex justify-content-between align-items-center">
+                <div className="dropdown-header d-flex justify-content-between align-items-center">
                   <span>Notifications</span>
-                  <span className="badge bg-danger">3</span>
-                </h6>
+                  <div className="d-flex gap-2 align-items-center">
+                    {unreadCount > 0 && (
+                      <span className="badge bg-danger">{unreadCount}</span>
+                    )}
+                    {unreadCount > 0 && (
+                      <button 
+                        className="btn btn-sm btn-link text-muted p-0"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          markAllAsRead();
+                        }}
+                        title="Mark all as read"
+                      >
+                        <i className="bi bi-check-all"></i>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </li>
               <li><hr className="dropdown-divider" /></li>
-              <li>
-                <a className="dropdown-item py-2" href="#" style={{ whiteSpace: 'normal' }}>
-                  <div className="d-flex align-items-start">
-                    <i className="bi bi-bug-fill text-danger me-2 mt-1"></i>
-                    <div>
-                      <strong>New bug assigned</strong>
-                      <br />
-                      <small className="text-muted">Login Button Not Working</small>
+              {notifications.length === 0 ? (
+                <li className="text-center py-3 text-muted">
+                  <i className="bi bi-bell-slash fs-3 d-block mb-2"></i>
+                  <small>No notifications yet</small>
+                </li>
+              ) : (
+                notifications.slice(0, 10).map((notification) => (
+                  <li key={notification._id}>
+                    <a 
+                      className={`dropdown-item py-2 ${notification.isRead ? '' : 'bg-light'}`} 
+                      href="#" 
+                      style={{ whiteSpace: 'normal' }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNotificationClick(notification);
+                      }}
+                    >
+                      <div className="d-flex align-items-start">
+                        <i className={`${getNotificationIcon(notification.type)} me-2 mt-1`}></i>
+                        <div className="flex-grow-1">
+                          <div className="d-flex justify-content-between align-items-start">
+                            <strong className={notification.isRead ? '' : 'fw-bold'}>
+                              {notification.title}
+                            </strong>
+                            <small className="text-muted ms-2">
+                              {formatTimeAgo(notification.createdAt)}
+                            </small>
+                          </div>
+                          <small className="text-muted">{notification.message}</small>
+                          {!notification.isRead && (
+                            <div className="mt-1">
+                              <span className="badge bg-primary" style={{ fontSize: '0.6rem' }}>New</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                ))
+              )}
+              {notifications.length > 10 && (
+                <>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li>
+                    <div className="dropdown-item text-center text-muted">
+                      <small>And {notifications.length - 10} more...</small>
                     </div>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a className="dropdown-item py-2" href="#" style={{ whiteSpace: 'normal' }}>
-                  <div className="d-flex align-items-start">
-                    <i className="bi bi-folder-fill text-primary me-2 mt-1"></i>
-                    <div>
-                      <strong>Project updated</strong>
-                      <br />
-                      <small className="text-muted">Website Redesign progress 45%</small>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li>
-                <a className="dropdown-item py-2" href="#" style={{ whiteSpace: 'normal' }}>
-                  <div className="d-flex align-items-start">
-                    <i className="bi bi-arrow-counterclockwise text-warning me-2 mt-1"></i>
-                    <div>
-                      <strong>Bug reopened</strong>
-                      <br />
-                      <small className="text-muted">Fix needs revision</small>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li><hr className="dropdown-divider" /></li>
-              <li>
-                <a className="dropdown-item text-center text-primary" href="#">
-                  <small>View all notifications</small>
-                </a>
-              </li>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 

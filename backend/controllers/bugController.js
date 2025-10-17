@@ -2,6 +2,12 @@ import Bug from '../models/Bug.js';
 import Project from '../models/Project.js';
 import User from '../models/User.js';
 import { sendBugAssignmentEmail, sendBugResolvedEmail } from '../utils/emailService.js';
+import { 
+  createBugAssignmentNotification, 
+  createBugResolvedNotification, 
+  createBugCreatedNotification, 
+  createBugReopenedNotification 
+} from './notificationController.js';
 
 export const getBugs = async (req, res) => {
   try {
@@ -54,6 +60,7 @@ export const createBug = async (req, res) => {
     try {
       const manager = await User.findOne({ role: 'manager' });
       if (manager) {
+        // Send email notification
         const { sendBugCreatedEmail } = await import('../utils/emailService.js');
         await sendBugCreatedEmail(
           manager.email,
@@ -62,6 +69,14 @@ export const createBug = async (req, res) => {
           bug.project.name,
           bug.priority,
           `${process.env.FRONTEND_URL}/manager/bugs`
+        );
+        
+        // Create in-app notification
+        await createBugCreatedNotification(
+          manager._id,
+          bug,
+          req.user.name,
+          bug.project.name
         );
       }
     } catch (emailError) {
@@ -87,7 +102,16 @@ export const updateBug = async (req, res) => {
       const project = await Project.findById(bug.project);
       const reporter = await User.findById(bug.reporter);
       try {
+        // Send email notification
         await sendBugResolvedEmail(reporter.email, bug.title, req.user.name, project.name);
+        
+        // Create in-app notification
+        await createBugResolvedNotification(
+          reporter._id,
+          bug,
+          req.user.name,
+          project.name
+        );
       } catch (emailError) {
         console.error('Email error:', emailError);
       }
@@ -141,12 +165,20 @@ export const assignBug = async (req, res) => {
       const user = await User.findById(userId);
       const project = await Project.findById(bug.project);
       try {
+        // Send email notification
         await sendBugAssignmentEmail(
           user.email,
           bug.title,
           user.name,
           project.name,
           `${process.env.FRONTEND_URL}/bugs/${bug._id}`
+        );
+        
+        // Create in-app notification
+        await createBugAssignmentNotification(
+          userId,
+          bug,
+          project.name
         );
       } catch (emailError) {
         console.error('Email error:', emailError);
@@ -202,6 +234,8 @@ export const verifyBug = async (req, res) => {
         try {
           const developer = await User.findById(bug.assignedTo);
           const project = await Project.findById(bug.project);
+          
+          // Send email notification
           const { sendBugReopenedEmail } = await import('../utils/emailService.js');
           await sendBugReopenedEmail(
             developer.email,
@@ -210,6 +244,14 @@ export const verifyBug = async (req, res) => {
             project.name,
             req.user.name,
             `${process.env.FRONTEND_URL}/developer/dashboard`
+          );
+          
+          // Create in-app notification
+          await createBugReopenedNotification(
+            developer._id,
+            bug,
+            req.user.name,
+            project.name
           );
         } catch (emailError) {
           console.error('Email error:', emailError);

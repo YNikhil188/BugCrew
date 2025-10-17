@@ -10,6 +10,7 @@ import projectRoutes from './routes/projectRoutes.js';
 import bugRoutes from './routes/bugRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import messageRoutes from './routes/messages.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,6 +64,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/bugs', bugRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Root route
 app.get('/', (req, res) => {

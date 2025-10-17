@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SidebarProvider } from './context/SidebarContext';
+import { NotificationProvider } from './context/NotificationContext';
 import PrivateRoute from './components/PrivateRoute';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -26,8 +27,9 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      <SidebarProvider>
-        <Router>
+      <NotificationProvider>
+        <SidebarProvider>
+          <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -201,8 +203,9 @@ function App() {
           
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-        </Router>
-      </SidebarProvider>
+          </Router>
+        </SidebarProvider>
+      </NotificationProvider>
     </AuthProvider>
   );
 }
